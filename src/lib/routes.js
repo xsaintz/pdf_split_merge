@@ -11,7 +11,7 @@
  * words people actually search for — the tool key ("merge") stays internal.
  */
 
-export const site = 'https://hamizangholib.github.io/pdf_split_merge';
+export const site = 'https://pdf.xsaintz.my.id';
 
 export const routes = [
   {

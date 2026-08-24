@@ -3,13 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- The site moved off GitHub Pages; send the old project-page URLs to the
+         custom domain before anything else on the page loads. -->
+    <script>
+      if (location.hostname === 'hamizangholib.github.io') {
+        location.replace(
+          'https://pdf.xsaintz.my.id' +
+            location.pathname.replace(/^\/pdf_split_merge/, '') +
+            location.search +
+            location.hash,
+        );
+      }
+    </script>
     <title>PDF Toolkit — Gabungkan, Pisahkan & Ubah PDF di Browser</title>
     <meta
       name="description"
       content="Gabungkan, pisahkan, atur halaman, perkecil PDF, dan ubah gambar atau Markdown menjadi PDF langsung di browser. Tanpa unggah, tanpa server, 100% privat."
     />
     <meta name="theme-color" content="#4b8ef1" />
-    <link rel="canonical" href="https://hamizangholib.github.io/pdf_split_merge/" />
+    <link rel="canonical" href="https://pdf.xsaintz.my.id/" />
 
     <!-- Social cards. og:image must be absolute, so it names the deployed site
          directly — update these URLs if the repository is renamed. The build
@@ -23,10 +36,10 @@
       property="og:description"
       content="Gabungkan, pisahkan, atur halaman, ubah gambar dan Markdown menjadi PDF, lalu perkecil ukurannya — semuanya di dalam browser Anda."
     />
-    <meta property="og:url" content="https://hamizangholib.github.io/pdf_split_merge/" />
+    <meta property="og:url" content="https://pdf.xsaintz.my.id/" />
     <meta
       property="og:image"
-      content="https://hamizangholib.github.io/pdf_split_merge/og-card.png"
+      content="https://pdf.xsaintz.my.id/og-card.png"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -39,7 +52,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://hamizangholib.github.io/pdf_split_merge/og-card.png"
+      content="https://pdf.xsaintz.my.id/og-card.png"
     />
 
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
@@ -54,7 +67,7 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "PDF Toolkit",
-        "url": "https://hamizangholib.github.io/pdf_split_merge/",
+        "url": "https://pdf.xsaintz.my.id/",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Membutuhkan JavaScript",
