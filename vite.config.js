@@ -8,7 +8,7 @@ import { routes, site, tools } from './src/lib/routes.js';
 // GitHub Pages serves this repository from a sub-path. An absolute base is what
 // makes the pre-rendered `/<slug>/index.html` pages below resolve their assets:
 // a relative base would look for them inside the slug's own directory.
-const base = '/pdf_split_merge/';
+const base = '/';
 
 const escapeHtml = (value) =>
   String(value).replace(
