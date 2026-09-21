@@ -2,15 +2,21 @@
  * Self-check for the image sniffing in `compress.js`:
  * `node src/lib/compress.selfcheck.mjs`
  *
- * Only `describeImage` is checked here. The rest of the module needs a canvas,
- * which node has not got — but this is the part that fails silently: mistake a
- * palette image for RGB and the compressor writes a document full of confetti,
- * with no error anywhere. Every case below is a stream shape a real PDF
+ * This checks the image sniffing and the final size gate. The canvas-dependent
+ * recoding itself cannot run in Node, but these are the silent failure points:
+ * accepting a larger output, or mistaking a palette image for RGB and writing
+ * a document full of confetti. Every image case below is a shape a real PDF
  * contains.
  */
 import assert from 'node:assert/strict';
 import { PDFContext, PDFName, PDFNumber, PDFRawStream } from 'pdf-lib';
 import { describeImage } from './compress.js';
+import { isSmallerPdf } from './pdf.js';
+
+// A candidate is eligible for download only when it is strictly smaller.
+assert.equal(isSmallerPdf(1_000, 999), true);
+assert.equal(isSmallerPdf(1_000, 1_000), false);
+assert.equal(isSmallerPdf(1_000, 1_001), false);
 
 const context = PDFContext.create();
 const empty = new Uint8Array(0);

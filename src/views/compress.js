@@ -12,7 +12,13 @@ import {
   setVisible,
   stripPdfExtension,
 } from '../lib/ui.js';
-import { buildFromPages, closeDocument, compressDocument, openDocument } from '../lib/pdf.js';
+import {
+  buildFromPages,
+  closeDocument,
+  compressDocument,
+  isSmallerPdf,
+  openDocument,
+} from '../lib/pdf.js';
 import { rasterizePages } from '../lib/preview.js';
 import { createFileLoader } from '../lib/loader.js';
 import { subNavMarkup } from '../lib/nav.js';
@@ -116,8 +122,8 @@ export function renderCompress() {
           </fieldset>
 
           <p class="text-fine text-ink-48">
-            Target ukuran pasti tidak tersedia: seberapa besar hasil akhirnya tergantung
-            isi dokumen. Kalau hasilnya ternyata tidak lebih kecil, file tidak diunduh.
+            File hasil hanya dibuat jika ukurannya benar-benar lebih kecil. Jika tidak,
+            file asli tetap dipertahankan dan tidak ada unduhan baru.
           </p>
 
           <div data-status></div>
@@ -220,21 +226,20 @@ export function renderCompress() {
             );
 
       const before = state.file.size;
-      const saved = before - bytes.length;
-      const percent = Math.round((saved / before) * 100);
-
-      if (saved <= 0) {
+      if (!isSmallerPdf(before, bytes.length)) {
         const advice =
           level === 'strong'
-            ? ' Dokumen ini isinya teks dan vektor, yang justru lebih boros sebagai gambar — gunakan tingkat Ringan atau Sedang.'
-            : ' Coba tingkat berikutnya kalau Anda bersedia menukar sedikit kualitas.';
+            ? ' Dokumen teks atau vektor sering lebih efisien tanpa digambar ulang; coba tingkat Ringan atau Sedang.'
+            : ' File seperti ini memang tidak punya banyak data yang bisa dipangkas. Anda bisa mencoba tingkat berikutnya jika bersedia menukar sedikit kualitas.';
         setStatus(
           'warning',
-          `Tidak ada penghematan: hasilnya ${formatBytes(bytes.length)}, sama atau lebih besar dari aslinya (${formatBytes(before)}). Tidak diunduh agar Anda tidak menyimpan versi yang lebih besar.${advice}`,
+          `PDF asli sudah lebih efisien pada pengaturan ini. Tidak ada file hasil yang dibuat atau diunduh. ${advice}`,
         );
         return;
       }
 
+      const saved = before - bytes.length;
+      const percent = Math.round((saved / before) * 100);
       const filename = `${stripPdfExtension(state.file.name)}-kecil.pdf`;
       const url = downloadBytes(bytes, filename, 'application/pdf', { keep: true });
 

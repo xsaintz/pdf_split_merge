@@ -128,6 +128,9 @@ export const buildFromPages = (pages, onProgress) =>
 
 /* ------------------------------------------------------------- pure helper */
 
+/** A compressed candidate may be downloaded only when it is strictly smaller. */
+export const isSmallerPdf = (originalSize, candidateSize) => candidateSize < originalSize;
+
 /**
  * Parses a human page-range string ("1-3, 5, 7-10") into zero-based page
  * indices, preserving the order the user typed and dropping duplicates.
