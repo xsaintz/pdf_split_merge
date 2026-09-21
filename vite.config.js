@@ -15,7 +15,6 @@ const escapeHtml = (value) =>
     /[&<>"]/g,
     (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[character],
   );
-q
 const urlOf = (slug) => `${site}${slug ? `/${slug}/` : '/'}`;
 
 /**
