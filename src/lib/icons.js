@@ -49,6 +49,13 @@ const shapes = {
     <path d="M15.6 8.4v5.2"/>
     <path d="M13.4 12.4 15.6 15l2.2-2.6"/>
   `,
+  /** A page with a pen laid across its corner. */
+  edit: `
+    <path d="M12.4 21.4H6.4a1.8 1.8 0 0 1-1.8-1.8V4.4a1.8 1.8 0 0 1 1.8-1.8h11.2a1.8 1.8 0 0 1 1.8 1.8v4.4"/>
+    <path d="M8 7.4h8"/>
+    <path d="M8 11h5"/>
+    <path d="m19.8 12.6 1.6 1.6-6 6-2.4.8.8-2.4Z"/>
+  `,
   /** The house mark: a sheet beside a page turning away from it. */
   brand: `
     <rect x="3.6" y="4.6" width="7" height="14.8" rx="1.8"/>

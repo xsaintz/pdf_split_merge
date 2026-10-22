@@ -128,7 +128,7 @@ export function renderWelcome() {
             <span class="text-caption font-medium text-action">Alat yang tersedia</span>
             <h2 class="text-display-md text-ink">Apa yang ingin Anda lakukan?</h2>
             <p class="text-body text-ink-80">
-              Enam alat, satu halaman, tanpa akun. Pilih satu dan berkas Anda selesai
+              Tujuh alat, satu halaman, tanpa akun. Pilih satu dan berkas Anda selesai
               dalam hitungan detik.
             </p>
           </div>

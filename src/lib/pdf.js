@@ -115,6 +115,12 @@ export const buildImages = (imagesId, options) => run('imagesBuild', { imagesId,
 
 export const abortImages = (imagesId) => run('imagesAbort', { imagesId }).catch(() => {});
 
+/**
+ * Bakes the editor's items into the document. Image bytes are copied rather
+ * than transferred: the editor keeps them, so the visitor can save again.
+ */
+export const editPages = (docId, items, images) => run('edit', { docId, items, images });
+
 export const compressDocument = (docId, level, onProgress) =>
   run('compress', { docId, level }, { onProgress });
 

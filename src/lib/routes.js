@@ -24,7 +24,7 @@ export const routes = [
       'Gabungkan, pisahkan, atur halaman, perkecil PDF, dan ubah gambar atau Markdown menjadi PDF langsung di browser. Tanpa unggah, tanpa server, 100% privat.',
     heading: 'Rapikan PDF Anda, tanpa meninggalkan browser.',
     intro:
-      'Enam alat PDF yang berjalan sepenuhnya di perangkat Anda: gabungkan, pisahkan, atur halaman, ubah gambar dan Markdown menjadi PDF, lalu perkecil ukurannya. Tidak ada berkas yang diunggah ke server mana pun.',
+      'Tujuh alat PDF yang berjalan sepenuhnya di perangkat Anda: gabungkan, pisahkan, atur halaman, edit isi halaman, ubah gambar dan Markdown menjadi PDF, lalu perkecil ukurannya. Tidak ada berkas yang diunggah ke server mana pun.',
   },
   {
     slug: 'gabungkan-pdf',
@@ -67,6 +67,20 @@ export const routes = [
     intro:
       'Tarik halaman untuk mengubah urutannya, putar halaman yang miring, dan buang halaman yang tidak diperlukan. Halaman aslinya tidak pernah diubah.',
     blurb: 'Tarik untuk mengurutkan ulang, putar halaman yang miring, dan buang yang tidak perlu.',
+  },
+  {
+    slug: 'edit-pdf',
+    name: 'Edit PDF',
+    key: 'edit',
+    label: 'Edit PDF',
+    icon: 'edit',
+    title: 'Edit PDF Online — Tambah Teks, Sorotan & Gambar | PDF Toolkit',
+    description:
+      'Tambahkan teks, sorotan, kotak, garis, coretan tangan, dan gambar ke halaman PDF, lalu simpan hasilnya. Berjalan di browser Anda — file tidak pernah diunggah.',
+    heading: 'Edit PDF',
+    intro:
+      'Tambahkan teks, sorotan, bentuk, coretan, dan gambar langsung di atas halaman — untuk mengisi formulir, memberi catatan, atau menempel tanda tangan.',
+    blurb: 'Tambahkan teks, sorotan, bentuk, coretan tangan, dan gambar langsung di halaman.',
   },
   {
     slug: 'gambar-ke-pdf',
@@ -112,7 +126,7 @@ export const routes = [
   },
 ];
 
-/** The six tool routes, in the order they appear in every navigation. */
+/** The tool routes, in the order they appear in every navigation. */
 export const tools = routes.filter((route) => route.slug !== '');
 
 export const routeBySlug = (slug) => routes.find((route) => route.slug === slug);

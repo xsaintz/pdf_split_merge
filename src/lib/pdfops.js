@@ -11,9 +11,10 @@
  * running a tool twice gives the same answer twice.
  */
 
-import { PDFDocument, degrees } from 'pdf-lib';
+import { LineCapStyle, PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib';
 import { compressPdf } from './compress.js';
 import { zipStore } from './zip.js';
+import { toUserSpace, winAnsiText } from './annotate.js';
 
 /** docId -> the untouched bytes of an opened file. */
 const documents = new Map();
@@ -310,4 +311,163 @@ export async function buildFromPages({ pages }, onProgress) {
   }
 
   return output.save({ useObjectStreams: true });
+}
+
+/* ------------------------------------------------------------------- edit */
+
+/** Font family -> [regular, bold] standard font. */
+const standardFonts = {
+  Helvetica: [StandardFonts.Helvetica, StandardFonts.HelveticaBold],
+  TimesRoman: [StandardFonts.TimesRoman, StandardFonts.TimesRomanBold],
+  Courier: [StandardFonts.Courier, StandardFonts.CourierBold],
+};
+
+/** "#rrggbb" as a pdf-lib colour; anything else is black. */
+function hexColor(value) {
+  const match = /^#?([\da-f]{6})$/i.exec(String(value ?? ''));
+  const number = parseInt(match ? match[1] : '000000', 16);
+  return rgb(((number >> 16) & 255) / 255, ((number >> 8) & 255) / 255, (number & 255) / 255);
+}
+
+/**
+ * Draws the editor's items onto the original pages and saves.
+ *
+ * Every geometry arrives in display space (see `toUserSpace`), so a page that
+ * carries its own /Rotate still gets text and images that read upright. The
+ * document is edited in place rather than copied, so links, forms and
+ * outlines survive untouched.
+ *
+ * `images` is a list of { bytes, kind }; an image item points into it by
+ * index, so one picture placed three times is embedded once.
+ */
+export async function edit({ docId, items, images = [] }) {
+  if (!items?.length) throw new Error('Belum ada yang ditambahkan ke dokumen ini.');
+
+  const output = stamp(await documentOf(docId));
+  const pages = output.getPages();
+
+  const fonts = new Map();
+  const fontOf = async (family, bold) => {
+    const key = `${family}-${bold}`;
+    if (!fonts.has(key)) {
+      const [regular, heavy] = standardFonts[family] ?? standardFonts.Helvetica;
+      fonts.set(key, await output.embedFont(bold ? heavy : regular));
+    }
+    return fonts.get(key);
+  };
+
+  const embedded = new Map();
+  const imageOf = async (index) => {
+    if (!embedded.has(index)) {
+      const entry = images[index];
+      try {
+        embedded.set(
+          index,
+          entry.kind === 'png' ? await output.embedPng(entry.bytes) : await output.embedJpg(entry.bytes),
+        );
+      } catch {
+        throw new Error(
+          'Salah satu gambar tidak dapat disisipkan. Simpan ulang gambar itu sebagai JPG atau PNG biasa, lalu coba lagi.',
+        );
+      }
+    }
+    return embedded.get(index);
+  };
+
+  for (const item of items) {
+    const page = pages[item.page];
+    if (!page) continue;
+
+    const rotation = page.getRotation().angle;
+    const box = { ...page.getSize(), rotation };
+    const at = (x, y) => toUserSpace(box, x, y);
+    const color = hexColor(item.color);
+    const opacity = item.opacity ?? 1;
+
+    if (item.type === 'text') {
+      const font = await fontOf(item.font, Boolean(item.bold));
+      // Each baseline is placed in display space and then mapped, so the lines
+      // stack downwards on screen whatever the page's rotation. pdf-lib's own
+      // multi-line drawing steps along user-space y, which is wrong once turned.
+      String(item.text ?? '')
+        .split('\n')
+        .forEach((line, index) => {
+          const text = winAnsiText(line);
+          if (!text.trim()) return;
+          const point = at(item.x, item.y + index * item.size * item.lineHeight);
+          page.drawText(text, {
+            ...point,
+            size: item.size,
+            font,
+            color,
+            opacity,
+            rotate: degrees(rotation),
+          });
+        });
+      continue;
+    }
+
+    if (item.type === 'image') {
+      // The lower-left corner of the upright box on screen; turned by the
+      // page's rotation, the image then grows the way the viewer sees it.
+      page.drawImage(await imageOf(item.image), {
+        ...at(item.x, item.y + item.h),
+        width: item.w,
+        height: item.h,
+        opacity,
+        rotate: degrees(rotation),
+      });
+      continue;
+    }
+
+    const stroke = { thickness: item.thickness, color, opacity, lineCap: LineCapStyle.Round };
+
+    if (item.type === 'line') {
+      page.drawLine({ start: at(item.x1, item.y1), end: at(item.x2, item.y2), ...stroke });
+      continue;
+    }
+
+    if (item.type === 'draw') {
+      const points = item.points.map(([x, y]) => at(x, y));
+      for (let index = 1; index < points.length; index++) {
+        page.drawLine({ start: points[index - 1], end: points[index], ...stroke });
+      }
+      // A single tap is a dot, which no segment would draw.
+      if (points.length === 1) {
+        page.drawCircle({ ...points[0], size: item.thickness / 2, color, opacity });
+      }
+      continue;
+    }
+
+    // rect | highlight | ellipse: axis-aligned on screen stays axis-aligned
+    // after a quarter turn, so the two mapped corners describe it fully.
+    const a = at(item.x, item.y);
+    const b = at(item.x + item.w, item.y + item.h);
+    const shape = {
+      x: Math.min(a.x, b.x),
+      y: Math.min(a.y, b.y),
+      width: Math.abs(b.x - a.x),
+      height: Math.abs(b.y - a.y),
+    };
+    const fill = item.fill ? { color, opacity } : {};
+    const border =
+      item.thickness > 0 ? { borderColor: color, borderWidth: item.thickness, borderOpacity: opacity } : {};
+    // pdf-lib paints a black fill when given neither; an empty shape is skipped.
+    if (!item.fill && !border.borderColor) continue;
+
+    if (item.type === 'ellipse') {
+      page.drawEllipse({
+        x: shape.x + shape.width / 2,
+        y: shape.y + shape.height / 2,
+        xScale: shape.width / 2,
+        yScale: shape.height / 2,
+        ...fill,
+        ...border,
+      });
+    } else {
+      page.drawRectangle({ ...shape, ...fill, ...border });
+    }
+  }
+
+  return output.save();
 }
