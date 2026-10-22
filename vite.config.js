@@ -196,6 +196,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registered by main.js, later than the plugin would — see the note there.
+      injectRegister: false,
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
         name: 'PDF Toolkit — Gabungkan, Pisahkan & Ubah Dokumen',

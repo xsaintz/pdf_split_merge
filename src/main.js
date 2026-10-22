@@ -220,6 +220,22 @@ if (menuToggle && mobileMenu) {
   });
 }
 
+/* ---------------------------------------------------------- offline cache */
+
+/**
+ * Installing the service worker downloads every tool's code (~2.5 MB) so the
+ * site works offline. Done at `load`, as the plugin does by default, it raced
+ * the visitor's own first page for the same files and fetched each one twice.
+ * Waiting until the page has settled lets the install reuse what the browser
+ * has already cached, and keeps the first visit's bandwidth for the visitor.
+ */
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const register = () => navigator.serviceWorker.register(`${base}sw.js`, { scope: base });
+    setTimeout(() => (window.requestIdleCallback ?? ((run) => run()))(register), 5000);
+  });
+}
+
 // The preloader has done its job the moment the first view is on screen.
 const preloader = document.querySelector('#preloader');
 if (preloader) {

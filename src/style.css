@@ -358,7 +358,28 @@
   }
 }
 
-/* The gradient on the call to action drifts slowly across the panel. */
+/* The soft background glows drift by moving, not by repainting.
+   They used `gradient-drift`, whose `background-position` animation forces a
+   repaint every frame — and on a 64px-blurred 384px circle that is a full
+   re-blur, sixty times a second, forever. A transform runs on the compositor:
+   the blurred circle is rasterised once and only slid around. */
+.blob-drift {
+  will-change: transform;
+  animation: blob-drift 12s ease-in-out infinite;
+}
+
+@keyframes blob-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(24px, -16px, 0) scale(1.06);
+  }
+}
+
+/* The gradient on the call to action drifts slowly across the panel. Only for
+   small elements: this repaints every frame (see `.blob-drift`). */
 .gradient-drift {
   background-size: 200% 200%;
   animation: gradient-drift 12s ease infinite;

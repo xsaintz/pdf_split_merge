@@ -57,8 +57,8 @@ export function renderWelcome() {
       <section class="relative overflow-hidden bg-white pt-16 md:pt-24">
         <div aria-hidden="true" class="pointer-events-none absolute inset-0">
           <span class="dot-grid absolute inset-x-0 top-0 h-64 opacity-60"></span>
-          <span class="gradient-drift absolute -left-32 -top-24 size-80 rounded-full bg-brand-gradient opacity-15 blur-3xl"></span>
-          <span class="gradient-drift absolute -right-24 top-40 size-96 rounded-full bg-brand-gradient opacity-10 blur-3xl"></span>
+          <span class="blob-drift absolute -left-32 -top-24 size-80 rounded-full bg-brand-gradient opacity-15 blur-3xl"></span>
+          <span class="blob-drift absolute -right-24 top-40 size-96 rounded-full bg-brand-gradient opacity-10 blur-3xl"></span>
         </div>
 
         <div class="relative mx-auto grid max-w-[1200px] items-center gap-14 px-5 pb-20 md:grid-cols-2">
@@ -101,7 +101,7 @@ export function renderWelcome() {
 
           <!-- A stack of pages, drawn rather than photographed. -->
           <div class="reveal relative mx-auto hidden aspect-square w-full max-w-[440px] md:block">
-            <div class="gradient-drift absolute inset-0 rounded-[42%] bg-brand-gradient opacity-10"></div>
+            <div class="blob-drift absolute inset-0 rounded-[42%] bg-brand-gradient opacity-10"></div>
             <div class="float-slow absolute left-[14%] top-[16%] h-[62%] w-[46%] rotate-[-8deg] rounded-md bg-white shadow-product"></div>
             <div class="float-slower absolute left-[30%] top-[12%] h-[68%] w-[48%] rotate-[6deg] rounded-md bg-white shadow-product"></div>
             <div class="absolute left-[24%] top-[22%] flex h-[60%] w-[52%] flex-col gap-3 rounded-md bg-white p-6 shadow-product">
@@ -121,7 +121,7 @@ export function renderWelcome() {
 
       <!-- Services -->
       <section class="relative overflow-hidden bg-parchment px-5 py-20">
-        <span aria-hidden="true" class="gradient-drift pointer-events-none absolute -right-40 bottom-0 size-96 rounded-full bg-brand-gradient opacity-10 blur-3xl"></span>
+        <span aria-hidden="true" class="blob-drift pointer-events-none absolute -right-40 bottom-0 size-96 rounded-full bg-brand-gradient opacity-10 blur-3xl"></span>
 
         <div class="relative mx-auto max-w-[1200px] space-y-12">
           <div class="reveal mx-auto max-w-[620px] space-y-4 text-center">

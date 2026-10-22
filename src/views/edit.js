@@ -130,7 +130,7 @@ export function renderEdit() {
             </button>
           </div>
 
-          <div class="sticky top-[136px] z-30 space-y-3 rounded-lg border border-hairline bg-white/90 p-3 shadow-soft backdrop-blur-xl">
+          <div class="sticky top-[136px] z-30 space-y-3 rounded-lg border border-hairline bg-white/95 p-3 shadow-soft">
             <div role="toolbar" aria-label="Alat edit" class="flex flex-wrap items-center gap-1.5">
               ${tools
                 .map(

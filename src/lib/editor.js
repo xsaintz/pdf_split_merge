@@ -52,6 +52,8 @@ export function createEditor({ pdfDocument, pages, state, remember, onChange }) 
   const layers = [];
   const scales = [];
   const stops = [];
+  /** Object URLs behind the rendered pages, released with the editor. */
+  const urls = [];
   let editingId = null;
   let destroyed = false;
 
@@ -65,7 +67,7 @@ export function createEditor({ pdfDocument, pages, state, remember, onChange }) 
     figure.className = 'space-y-2';
     figure.innerHTML = `
       <div data-frame class="relative mx-auto w-full max-w-[820px] overflow-hidden rounded-sm bg-white shadow-soft" style="aspect-ratio: ${size.width} / ${size.height}">
-        <canvas class="block h-full w-full"></canvas>
+        <img alt="" class="block h-full w-full" draggable="false" />
         <div data-layer class="absolute left-0 top-0 origin-top-left select-none" style="width: ${px(size.width)}; height: ${px(size.height)}"></div>
       </div>
       <figcaption class="text-center text-fine text-ink-48">Halaman ${index + 1} dari ${pages.length}</figcaption>
@@ -92,10 +94,27 @@ export function createEditor({ pdfDocument, pages, state, remember, onChange }) 
         // ponytail: a much wider window later shows it a little soft; re-render on resize if that matters.
         const ratio = Math.min(window.devicePixelRatio || 1, 2);
         const viewport = page.getViewport({ scale: (frame.clientWidth * ratio) / size.width });
-        const canvas = frame.querySelector('canvas');
+        const canvas = document.createElement('canvas');
         canvas.width = Math.ceil(viewport.width);
         canvas.height = Math.ceil(viewport.height);
         await page.render({ canvas, canvasContext: canvas.getContext('2d'), viewport }).promise;
+        page.cleanup();
+
+        // A live canvas pins its full bitmap — ~15 MB a page at 2× — for as long
+        // as the page exists, so a long document ran the tab out of memory. As
+        // an <img> the browser is free to drop the decoded pixels while the page
+        // is scrolled away, and the canvas is released here.
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+        const image = frame.querySelector('img');
+        if (blob && !destroyed) {
+          image.src = URL.createObjectURL(blob);
+          urls.push(image.src);
+          canvas.width = 0;
+          canvas.height = 0;
+        } else if (!destroyed) {
+          canvas.className = 'block h-full w-full';
+          image.replaceWith(canvas);
+        }
       }),
     );
   });
@@ -551,6 +570,7 @@ export function createEditor({ pdfDocument, pages, state, remember, onChange }) 
     destroyed = true;
     stops.forEach((stop) => stop());
     resizeObserver.disconnect();
+    urls.forEach((url) => URL.revokeObjectURL(url));
   }
 
   paint();

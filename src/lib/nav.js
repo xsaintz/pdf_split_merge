@@ -28,7 +28,7 @@ export function subNavMarkup(currentSlug) {
     .join('');
 
   return `
-    <div class="sticky top-20 z-40 border-b border-hairline bg-white/85 backdrop-blur-xl backdrop-saturate-150">
+    <div class="sticky top-20 z-40 border-b border-hairline bg-white/95">
       <div class="mx-auto flex h-[56px] max-w-[1200px] items-center gap-4 overflow-x-auto px-5">
         <a href="${pathOf('')}" class="flex shrink-0 items-center gap-1.5 text-caption ${cls.link}">
           <i data-lucide="arrow-left" class="size-4"></i>
