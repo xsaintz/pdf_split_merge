@@ -24,7 +24,7 @@ export const routes = [
       'Gabungkan, pisahkan, atur halaman, perkecil PDF, dan ubah gambar atau Markdown menjadi PDF langsung di browser. Tanpa unggah, tanpa server, 100% privat.',
     heading: 'Rapikan PDF Anda, tanpa meninggalkan browser.',
     intro:
-      'Tujuh alat PDF yang berjalan sepenuhnya di perangkat Anda: gabungkan, pisahkan, atur halaman, edit isi halaman, ubah gambar dan Markdown menjadi PDF, lalu perkecil ukurannya. Tidak ada berkas yang diunggah ke server mana pun.',
+      'Delapan alat PDF yang berjalan sepenuhnya di perangkat Anda: gabungkan, pisahkan, atur halaman, edit isi halaman, ubah ukuran kertas, ubah gambar dan Markdown menjadi PDF, lalu perkecil ukurannya. Tidak ada berkas yang diunggah ke server mana pun.',
   },
   {
     slug: 'gabungkan-pdf',
@@ -81,6 +81,20 @@ export const routes = [
     intro:
       'Tambahkan teks, sorotan, bentuk, coretan, dan gambar langsung di atas halaman — untuk mengisi formulir, memberi catatan, atau menempel tanda tangan.',
     blurb: 'Tambahkan teks, sorotan, bentuk, coretan tangan, dan gambar langsung di halaman.',
+  },
+  {
+    slug: 'ubah-ukuran-pdf',
+    name: 'Ubah Ukuran PDF',
+    key: 'resize',
+    label: 'Ubah Ukuran',
+    icon: 'resize',
+    title: 'Ubah Ukuran Halaman PDF — A4, A5, Letter, Kustom | PDF Toolkit',
+    description:
+      'Ubah ukuran kertas PDF ke A4, A3, A5, Letter, Legal, atau ukuran sendiri. Isi halaman diskalakan agar pas tanpa terpotong, dengan margin yang bisa diatur. Tanpa unggah.',
+    heading: 'Ubah ukuran halaman PDF',
+    intro:
+      'Pindahkan setiap halaman ke ukuran kertas lain — A4, A5, Letter, atau ukuran Anda sendiri. Isi halaman diperbesar atau diperkecil agar pas, tanpa terpotong.',
+    blurb: 'Ubah ukuran kertas ke A4, A5, Letter, atau ukuran sendiri — isi diskalakan agar pas.',
   },
   {
     slug: 'gambar-ke-pdf',

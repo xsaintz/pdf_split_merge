@@ -18,6 +18,7 @@ const views = {
   split: () => import('./views/split.js').then((module) => module.renderSplit),
   organize: () => import('./views/organize.js').then((module) => module.renderOrganize),
   edit: () => import('./views/edit.js').then((module) => module.renderEdit),
+  resize: () => import('./views/resize.js').then((module) => module.renderResize),
   images: () => import('./views/images.js').then((module) => module.renderImages),
   markdown: () => import('./views/markdown.js').then((module) => module.renderMarkdownView),
   compress: () => import('./views/compress.js').then((module) => module.renderCompress),

@@ -13,9 +13,10 @@ import {
 } from '../lib/ui.js';
 import { arrangePages, closeDocument, openDocument } from '../lib/pdf.js';
 import { captureRects, collapseOut, playFlip, rotateTo } from '../lib/motion.js';
-import { openPreview } from '../lib/preview.js';
+import { closePreview, openPreview } from '../lib/preview.js';
 import { attachDragReorder, attachThumbnails } from '../lib/pagegrid.js';
 import { createFileLoader } from '../lib/loader.js';
+import { createInsertControl } from '../lib/insert.js';
 import { subNavMarkup } from '../lib/nav.js';
 import { brandIcon } from '../lib/icons.js';
 
@@ -95,6 +96,8 @@ export function renderOrganize() {
               <i data-lucide="trash-2" class="size-[18px]"></i>
             </button>
           </div>
+
+          <div data-insert></div>
 
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" data-undo class="${cls.chip}" disabled>
@@ -311,10 +314,38 @@ export function renderOrganize() {
 
   /* ------------------------------------------------------------ file intake */
 
+  // New pages are appended to the source, so every index the order, the
+  // thumbnail cache and the undo history hold stays valid; they are placed at
+  // the chosen position in the order instead. The position counts cards on
+  // screen, not source pages.
+  const insertControl = createInsertControl({
+    appendOnly: true,
+    getDocId: () => state.docId,
+    getPageCount: () => state.order.length,
+    onInserted: async (result, position) => {
+      const previous = state.preview;
+      state.preview = await openPreview(result.bytes);
+      closePreview(previous);
+      state.file = new File([result.bytes], state.file.name, { type: 'application/pdf' });
+
+      remember();
+      const added = Array.from({ length: result.inserted }, (_, offset) => ({
+        index: result.at + offset,
+        rotation: 0,
+      }));
+      state.order.splice(position, 0, ...added);
+      state.pageCount = result.pageCount;
+      metaHost.textContent = `${state.pageCount} halaman · ${formatBytes(state.file.size)}`;
+      setStatus(null, '');
+      renderGrid();
+    },
+  });
+  root.querySelector('[data-insert]').replaceWith(insertControl.element);
+
   function clearDocument() {
     stopThumbnails?.();
     stopThumbnails = null;
-    state.preview?.destroy?.();
+    if (state.preview) closePreview(state.preview);
     closeDocument(state.docId);
 
     state.file = null;
@@ -349,6 +380,7 @@ export function renderOrganize() {
 
       nameHost.textContent = file.name;
       metaHost.textContent = `${pageCount} halaman · ${formatBytes(file.size)}`;
+      insertControl.refresh();
 
       setVisible(detailHost, true);
       renderGrid();

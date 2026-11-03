@@ -19,9 +19,10 @@ import {
   openDocument,
   parsePageRanges,
 } from '../lib/pdf.js';
-import { openPreview } from '../lib/preview.js';
+import { closePreview, openPreview } from '../lib/preview.js';
 import { attachThumbnails } from '../lib/pagegrid.js';
 import { createFileLoader } from '../lib/loader.js';
+import { createInsertControl } from '../lib/insert.js';
 import { subNavMarkup } from '../lib/nav.js';
 import { brandIcon } from '../lib/icons.js';
 
@@ -105,6 +106,8 @@ export function renderSplit() {
                 <i data-lucide="trash-2" class="size-[18px]"></i>
               </button>
             </div>
+
+            <div data-insert></div>
 
             <!-- Range input -->
             <div class="space-y-4">
@@ -295,10 +298,34 @@ export function renderSplit() {
 
   /* ------------------------------------------------------------ file intake */
 
+  const insertControl = createInsertControl({
+    getDocId: () => state.docId,
+    getPageCount: () => state.pageCount,
+    onInserted: async (result) => {
+      const previous = state.preview;
+      state.preview = await openPreview(result.bytes);
+      closePreview(previous);
+      state.pageCount = result.pageCount;
+      state.file = new File([result.bytes], state.file.name, { type: 'application/pdf' });
+
+      // Pages already picked keep their place; everything after the insertion
+      // point moves down by the pages that went in.
+      state.selection = state.selection.map((page) =>
+        page > result.at ? page + result.inserted : page,
+      );
+      rangeInput.value = compressRanges(state.selection);
+      metaHost.textContent = `${state.pageCount} halaman · ${formatBytes(state.file.size)}`;
+      setStatus(null, '');
+      buildGrid();
+      renderPreview();
+    },
+  });
+  root.querySelector('[data-insert]').replaceWith(insertControl.element);
+
   function clearDocument() {
     stopThumbnails?.();
     stopThumbnails = null;
-    state.preview?.destroy?.();
+    if (state.preview) closePreview(state.preview);
     closeDocument(state.docId);
 
     state.file = null;
@@ -329,6 +356,7 @@ export function renderSplit() {
       nameHost.textContent = file.name;
       metaHost.textContent = `${state.pageCount} halaman · ${formatBytes(file.size)}`;
       rangeInput.value = '';
+      insertControl.refresh();
 
       setVisible(detailHost, true);
       buildGrid();

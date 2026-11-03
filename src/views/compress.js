@@ -21,6 +21,7 @@ import {
 } from '../lib/pdf.js';
 import { rasterizePages } from '../lib/preview.js';
 import { createFileLoader } from '../lib/loader.js';
+import { createInsertControl } from '../lib/insert.js';
 import { subNavMarkup } from '../lib/nav.js';
 import { brandIcon } from '../lib/icons.js';
 
@@ -37,7 +38,7 @@ const rasterPresets = {
 
 export function renderCompress() {
   /** @type {{ file: File|null, docId: number|null, pageCount: number, status: string|null, message: string, busy: boolean }} */
-  const state = { file: null, docId: null, pageCount: 0, status: null, message: '', busy: false };
+  const state = { file: null, docId: null, pageCount: 0, combined: false, status: null, message: '', busy: false };
 
   const root = html(`
     <div>
@@ -67,6 +68,8 @@ export function renderCompress() {
               <i data-lucide="trash-2" class="size-[18px]"></i>
             </button>
           </div>
+
+          <div data-insert></div>
 
           <fieldset class="space-y-3">
             <legend class="mb-3 text-tagline text-ink">Tingkat kompresi</legend>
@@ -153,8 +156,24 @@ export function renderCompress() {
     paintStatus(statusHost, status, message);
   }
 
+  // Inserted pages make `state.file` the combined document, so the size
+  // comparison and the "kuat" level both work from what is on screen.
+  const insertControl = createInsertControl({
+    getDocId: () => state.docId,
+    getPageCount: () => state.pageCount,
+    onInserted: (result) => {
+      state.pageCount = result.pageCount;
+      state.file = new File([result.bytes], state.file.name, { type: 'application/pdf' });
+      state.combined = true;
+      metaHost.textContent = `${state.pageCount} halaman · ${formatBytes(state.file.size)}`;
+      setStatus(null, '');
+    },
+  });
+  root.querySelector('[data-insert]').replaceWith(insertControl.element);
+
   function clearDocument() {
     closeDocument(state.docId);
+    state.combined = false;
     state.file = null;
     state.docId = null;
     state.pageCount = 0;
@@ -180,6 +199,7 @@ export function renderCompress() {
 
       nameHost.textContent = file.name;
       metaHost.textContent = `${state.pageCount} halaman · ${formatBytes(file.size)}`;
+      insertControl.refresh();
       setVisible(detailHost, true);
       setVisible(presetWrap, chosenLevel() === 'strong');
       paintIcons(detailHost);
@@ -231,9 +251,11 @@ export function renderCompress() {
           level === 'strong'
             ? ' Dokumen teks atau vektor sering lebih efisien tanpa digambar ulang; coba tingkat Ringan atau Sedang.'
             : ' File seperti ini memang tidak punya banyak data yang bisa dipangkas. Anda bisa mencoba tingkat berikutnya jika bersedia menukar sedikit kualitas.';
+        // The combined document is still worth having when it cannot shrink.
         setStatus(
           'warning',
-          `PDF asli sudah lebih efisien pada pengaturan ini. Tidak ada file hasil yang dibuat atau diunduh. ${advice}`,
+          `PDF asli sudah lebih efisien pada pengaturan ini. Tidak ada file hasil yang dibuat atau diunduh. ${advice}` +
+            (state.combined ? resultLink(URL.createObjectURL(state.file), 'Buka dokumen gabungan') : ''),
         );
         return;
       }

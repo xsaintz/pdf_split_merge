@@ -4,38 +4,13 @@ import { brandIcon } from '../lib/icons.js';
 
 /**
  * The landing surface, laid out the way the reference template does it:
- * a split hero, a card grid of services on a soft grey field, a counted-up
- * fact strip, a three-step explainer, and a technology ticker. Sections
- * alternate white / #f7f7f7 and are joined by a shallow wave, so the colour
+ * a split hero, a card grid of services on a soft grey field, and a technology
+ * ticker. The hero and the grid are joined by a shallow wave, so the colour
  * change itself carries the rhythm — no dividers needed.
  */
 
 /** Formats supported anywhere in the toolkit — shown as chips under the hero. */
 const formats = ['PDF', 'JPG', 'PNG', 'WEBP', 'MD', 'TXT', 'ZIP'];
-
-const facts = [
-  { value: tools.length, suffix: '', label: 'alat siap pakai' },
-  { value: 100, suffix: '%', label: 'diproses di perangkat' },
-  { value: formats.length, suffix: '', label: 'format didukung' },
-];
-
-const steps = [
-  {
-    icon: 'organize',
-    title: 'Pilih alatnya',
-    body: 'Gabungkan, pisahkan, atur halaman, ubah gambar atau Markdown, atau perkecil ukuran.',
-  },
-  {
-    icon: 'images',
-    title: 'Jatuhkan berkasnya',
-    body: 'Tarik ke area unggah atau pilih dari perangkat. Berkas dibaca langsung dari disk Anda.',
-  },
-  {
-    icon: 'compress',
-    title: 'Simpan hasilnya',
-    body: 'Hasil terunduh otomatis begitu selesai — tanpa antrean dan tanpa tautan kedaluwarsa.',
-  },
-];
 
 const stack = ['Vite', 'Tailwind CSS', 'pdf-lib', 'pdf.js', 'marked', 'Lucide', 'GitHub Pages'];
 
@@ -128,7 +103,7 @@ export function renderWelcome() {
             <span class="text-caption font-medium text-action">Alat yang tersedia</span>
             <h2 class="text-display-md text-ink">Apa yang ingin Anda lakukan?</h2>
             <p class="text-body text-ink-80">
-              Tujuh alat, satu halaman, tanpa akun. Pilih satu dan berkas Anda selesai
+              Delapan alat, satu halaman, tanpa akun. Pilih satu dan berkas Anda selesai
               dalam hitungan detik.
             </p>
           </div>
@@ -158,97 +133,6 @@ export function renderWelcome() {
         </div>
       </section>
 
-      <!-- Facts -->
-      <section class="bg-white px-5 py-16">
-        <div class="stagger mx-auto grid max-w-[900px] gap-10 text-center sm:grid-cols-3">
-          ${facts
-            .map(
-              (fact) => `
-                <div class="reveal space-y-1">
-                  <p class="text-display-lg text-brand-gradient">
-                    <span data-count="${fact.value}">${fact.value}</span>${fact.suffix}
-                  </p>
-                  <p class="text-caption text-ink-80">${fact.label}</p>
-                </div>
-              `,
-            )
-            .join('')}
-        </div>
-      </section>
-
-      <!-- How it works -->
-      <section class="relative overflow-hidden bg-white px-5 pb-20">
-        <div class="mx-auto max-w-[1120px] space-y-12">
-          <div class="reveal mx-auto max-w-[560px] space-y-4 text-center">
-            <span class="text-caption font-medium text-action">Cara kerja</span>
-            <h2 class="text-display-md text-ink">Tiga langkah, selesai</h2>
-          </div>
-
-          <div class="relative">
-            <!-- The line the three steps sit on. -->
-            <span
-              aria-hidden="true"
-              class="absolute left-0 right-0 top-7 hidden h-0.5 bg-brand-gradient opacity-30 md:block"
-            ></span>
-
-            <ol class="stagger relative grid gap-10 md:grid-cols-3">
-              ${steps
-                .map(
-                  (step, index) => `
-                    <li class="reveal space-y-3 text-center md:px-4">
-                      <span class="mx-auto flex size-14 items-center justify-center rounded-full bg-brand-gradient text-white shadow-soft ring-8 ring-white">
-                        ${brandIcon(step.icon, 'size-6')}
-                      </span>
-                      <p class="text-fine font-medium text-action">Langkah ${index + 1}</p>
-                      <h3 class="text-tagline font-bold text-ink">${step.title}</h3>
-                      <p class="text-caption text-ink-80">${step.body}</p>
-                    </li>
-                  `,
-                )
-                .join('')}
-            </ol>
-          </div>
-        </div>
-
-        ${wave('#f7f7f7')}
-      </section>
-
-      <!-- Why -->
-      <section class="bg-parchment px-5 py-20">
-        <div class="stagger mx-auto grid max-w-[1120px] gap-12 md:grid-cols-3">
-          <div class="reveal space-y-3">
-            <span class="flex size-12 items-center justify-center rounded-md bg-brand-gradient text-white">
-              <i data-lucide="shield-check" class="size-6"></i>
-            </span>
-            <h3 class="text-tagline font-bold text-ink">Privat sepenuhnya</h3>
-            <p class="text-caption text-ink-80">
-              Berkas tidak pernah diunggah. Seluruh proses berjalan di dalam browser Anda,
-              bahkan saat koneksi terputus.
-            </p>
-          </div>
-          <div class="reveal space-y-3">
-            <span class="flex size-12 items-center justify-center rounded-md bg-brand-gradient text-white">
-              <i data-lucide="layers" class="size-6"></i>
-            </span>
-            <h3 class="text-tagline font-bold text-ink">Urutan sesuai keinginan</h3>
-            <p class="text-caption text-ink-80">
-              Susun ulang, putar, naikkan, turunkan, atau hapus halaman sebelum hasil
-              akhirnya dibuat.
-            </p>
-          </div>
-          <div class="reveal space-y-3">
-            <span class="flex size-12 items-center justify-center rounded-md bg-brand-gradient text-white">
-              <i data-lucide="download" class="size-6"></i>
-            </span>
-            <h3 class="text-tagline font-bold text-ink">Langsung tersimpan</h3>
-            <p class="text-caption text-ink-80">
-              Hasilnya terunduh otomatis begitu proses selesai — tanpa antrean, tanpa
-              tautan kedaluwarsa.
-            </p>
-          </div>
-        </div>
-      </section>
-
       <!-- Technology ticker. One pass of the list is ~900px wide; the list is
            repeated six times and the track scrolls by half its width, so half a
            track (~2700px) still fills an ultrawide screen rather than leaving a
@@ -269,44 +153,6 @@ export function renderWelcome() {
     </div>
   `);
 
-  attachCounters(root);
   return root;
 }
 
-/**
- * Counts each fact up from zero the first time it scrolls into view. A browser
- * without IntersectionObserver simply keeps the final number, which is already
- * in the markup.
- */
-function attachCounters(root) {
-  const numbers = [...root.querySelectorAll('[data-count]')];
-
-  if (!('IntersectionObserver' in window)) return;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        observer.unobserve(entry.target);
-
-        const target = Number(entry.target.dataset.count);
-        const startedAt = performance.now();
-
-        const step = (now) => {
-          const progress = Math.min((now - startedAt) / 900, 1);
-          // Ease-out cubic: fast at first, settling on the final number.
-          entry.target.textContent = Math.round(target * (1 - (1 - progress) ** 3));
-          if (progress < 1) requestAnimationFrame(step);
-        };
-
-        requestAnimationFrame(step);
-      });
-    },
-    { threshold: 0.4 },
-  );
-
-  numbers.forEach((element) => {
-    element.textContent = '0';
-    observer.observe(element);
-  });
-}

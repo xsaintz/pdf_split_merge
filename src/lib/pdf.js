@@ -90,6 +90,10 @@ export function closeDocument(docId) {
   if (docId != null) run('close', { docId });
 }
 
+/** Inserts another file's pages before index `at`; the document keeps its handle. */
+export const insertDocument = (docId, bytes, name, at) =>
+  run('insert', { docId, bytes, name, at }, { transfer: [bytes.buffer] });
+
 export const startMerge = () => run('mergeStart', {});
 
 export const addToMerge = (mergeId, bytes, name) =>
@@ -120,6 +124,9 @@ export const abortImages = (imagesId) => run('imagesAbort', { imagesId }).catch(
  * than transferred: the editor keeps them, so the visitor can save again.
  */
 export const editPages = (docId, items, images) => run('edit', { docId, items, images });
+
+/** Puts every page on a sheet of `target` points; see `fitPage` for the layout. */
+export const resizePages = (docId, options) => run('resize', { docId, ...options });
 
 export const compressDocument = (docId, level, onProgress) =>
   run('compress', { docId, level }, { onProgress });

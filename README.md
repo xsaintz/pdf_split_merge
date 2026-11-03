@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Privacy First](https://img.shields.io/badge/Privacy-100%25_Client--Side-green.svg)](#-privasi--keamanan-data)
 
-Aplikasi web modern, cepat, dan aman berbasis browser untuk mengolah dokumen PDF: **menggabungkan (Merge)**, **memisahkan (Split)**, **mengatur halaman (Organize)**, **mengedit PDF (Edit)**, **mengonversi Gambar ke PDF**, **mengonversi Markdown ke PDF**, dan **memperkecil ukuran PDF (Compress)**.
+Aplikasi web modern, cepat, dan aman berbasis browser untuk mengolah dokumen PDF: **menggabungkan (Merge)**, **memisahkan (Split)**, **mengatur halaman (Organize)**, **mengedit PDF (Edit)**, **mengubah ukuran halaman (Resize)**, **mengonversi Gambar ke PDF**, **mengonversi Markdown ke PDF**, dan **memperkecil ukuran PDF (Compress)**.
 
 Seluruh proses pengolahan dilakukan **100% secara lokal di browser Anda** menggunakan `pdf-lib` dan `pdfjs-dist` — **tidak ada berkas atau data yang diunggah ke server mana pun.**
 
@@ -30,6 +30,10 @@ Seluruh proses pengolahan dilakukan **100% secara lokal di browser Anda** menggu
   - Tambahkan teks (3 jenis huruf, ukuran, warna, tebal), sorotan, kotak, oval, garis, coretan tangan, dan gambar di atas halaman.
   - Pindahkan, ubah ukuran, ubah gaya, hapus, dan batalkan (Ctrl + Z) setiap tambahan.
   - Hasil ditulis langsung ke halaman asli, termasuk halaman yang diputar; tautan dan formulir asli tetap utuh.
+- 📐 **Ubah Ukuran Halaman (Resize)**:
+  - Pindahkan semua halaman ke A3, A4, A5, Letter, Legal, atau ukuran sendiri (mm).
+  - Orientasi mengikuti halaman asli, atau dipaksa potret/lanskap; margin bisa diatur.
+  - Isi diskalakan agar pas tanpa terpotong dan diletakkan di tengah, termasuk halaman yang diputar.
 - 🖼️ **Gambar ke PDF (Images to PDF)**:
   - Konversi berbagai berkas gambar (JPG, PNG, WebP, GIF, BMP) menjadi satu dokumen PDF.
   - Atur urutan tampilan gambar sebelum PDF dibuat.
@@ -169,6 +173,7 @@ pdf-toolkit/
 │   │   ├── split.js        # Fitur pemisahan PDF
 │   │   ├── organize.js     # Fitur rotasi, susun ulang & hapus halaman
 │   │   ├── edit.js         # Fitur edit PDF: teks, sorotan, bentuk, coretan & gambar
+│   │   ├── resize.js       # Fitur ubah ukuran halaman (A4, A5, Letter, kustom)
 │   │   ├── images.js       # Fitur konversi Gambar ke PDF
 │   │   ├── markdown.js     # Fitur konversi Markdown ke PDF
 │   │   └── compress.js     # Fitur kompresi PDF

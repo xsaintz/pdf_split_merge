@@ -93,7 +93,7 @@
       </div>
     </div>
 
-    <!-- Seven navigation links stand between the top of the page and the upload
+    <!-- Eight navigation links stand between the top of the page and the upload
          area; this is the way past them for anyone browsing by keyboard. -->
     <a href="#app" class="skip-link">Lompat ke konten</a>
 
@@ -101,10 +101,11 @@
          announced here instead. -->
     <p id="route-announcer" class="sr-only" role="status" aria-live="polite"></p>
 
-    <!-- global-nav -->
+    <!-- global-nav. Eight tool links fit from xl; the "processed on your device"
+         pill only fits beside them in a wider bar, hence 2xl:max-w-[1320px]. -->
     <header class="site-header sticky top-0 z-50 h-20 bg-white shadow-soft">
       <nav
-        class="mx-auto flex h-full max-w-[1200px] items-center gap-6 overflow-x-auto px-5 text-nav text-ink-80"
+        class="mx-auto flex h-full max-w-[1200px] items-center 2xl:max-w-[1320px] gap-6 overflow-x-auto px-5 text-nav text-ink-80"
         aria-label="Navigasi utama"
       >
         <a href="%BASE_URL%" class="flex shrink-0 items-center gap-2.5 text-tagline text-ink">
@@ -130,16 +131,17 @@
         </a>
 
         <!-- desktop links -->
-        <div class="ml-auto hidden items-center gap-6 lg:flex">
+        <div class="ml-auto hidden items-center gap-6 xl:flex">
           <a href="%BASE_URL%gabungkan-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Gabungkan</a>
           <a href="%BASE_URL%pisahkan-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Pisahkan</a>
           <a href="%BASE_URL%atur-halaman-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Atur Halaman</a>
           <a href="%BASE_URL%edit-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Edit PDF</a>
+          <a href="%BASE_URL%ubah-ukuran-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Ubah Ukuran</a>
           <a href="%BASE_URL%gambar-ke-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Gambar ke PDF</a>
           <a href="%BASE_URL%markdown-ke-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Markdown ke PDF</a>
           <a href="%BASE_URL%perkecil-pdf/" class="nav-link shrink-0 transition-colors hover:text-action">Perkecil</a>
           <span
-            class="gradient-drift hidden shrink-0 items-center gap-2 rounded-full bg-brand-gradient px-6 py-2.5 text-white xl:flex"
+            class="gradient-drift hidden shrink-0 items-center gap-2 rounded-full bg-brand-gradient px-6 py-2.5 text-white 2xl:flex"
           >
             <i data-lucide="shield-check" class="size-4"></i>
             Diproses di perangkat Anda
@@ -153,7 +155,7 @@
           aria-expanded="false"
           aria-controls="mobile-menu"
           aria-label="Buka menu navigasi"
-          class="menu-toggle ml-auto flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-parchment hover:text-action lg:hidden"
+          class="menu-toggle ml-auto flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-parchment hover:text-action xl:hidden"
         >
           <i data-lucide="menu" class="icon-closed size-6"></i>
           <i data-lucide="x" class="icon-open size-6"></i>
@@ -163,7 +165,7 @@
       <!-- mobile panel: collapsed to zero height until the toggle opens it -->
       <div
         id="mobile-menu"
-        class="mobile-menu absolute inset-x-0 top-20 border-b border-hairline bg-white shadow-soft lg:hidden"
+        class="mobile-menu absolute inset-x-0 top-20 border-b border-hairline bg-white shadow-soft xl:hidden"
       >
         <!-- The animated grid row has to be able to collapse to nothing, and
              padding does not collapse — so the padded panel sits one level in,
@@ -174,6 +176,7 @@
           <a href="%BASE_URL%pisahkan-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Pisahkan</a>
           <a href="%BASE_URL%atur-halaman-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Atur Halaman</a>
           <a href="%BASE_URL%edit-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Edit PDF</a>
+          <a href="%BASE_URL%ubah-ukuran-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Ubah Ukuran</a>
           <a href="%BASE_URL%gambar-ke-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Gambar ke PDF</a>
           <a href="%BASE_URL%markdown-ke-pdf/" class="border-b border-divider py-3.5 text-ink-80 transition-colors hover:text-action">Markdown ke PDF</a>
           <a href="%BASE_URL%perkecil-pdf/" class="py-3.5 text-ink-80 transition-colors hover:text-action">Perkecil</a>
@@ -226,6 +229,7 @@
               <li><a href="%BASE_URL%pisahkan-pdf/" class="transition-colors hover:text-action-dark">Pisahkan PDF</a></li>
               <li><a href="%BASE_URL%atur-halaman-pdf/" class="transition-colors hover:text-action-dark">Atur Halaman PDF</a></li>
               <li><a href="%BASE_URL%edit-pdf/" class="transition-colors hover:text-action-dark">Edit PDF</a></li>
+              <li><a href="%BASE_URL%ubah-ukuran-pdf/" class="transition-colors hover:text-action-dark">Ubah Ukuran PDF</a></li>
               <li><a href="%BASE_URL%gambar-ke-pdf/" class="transition-colors hover:text-action-dark">Gambar ke PDF</a></li>
               <li><a href="%BASE_URL%markdown-ke-pdf/" class="transition-colors hover:text-action-dark">Markdown ke PDF</a></li>
               <li><a href="%BASE_URL%perkecil-pdf/" class="transition-colors hover:text-action-dark">Perkecil PDF</a></li>

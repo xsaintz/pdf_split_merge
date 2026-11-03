@@ -15,6 +15,7 @@ import { LineCapStyle, PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib'
 import { compressPdf } from './compress.js';
 import { zipStore } from './zip.js';
 import { toUserSpace, winAnsiText } from './annotate.js';
+import { fitPage, paperSizes } from './pagesize.js';
 
 /** docId -> the untouched bytes of an opened file. */
 const documents = new Map();
@@ -73,7 +74,45 @@ export async function open({ bytes, name }) {
 
   const docId = nextId++;
   documents.set(docId, bytes);
-  return { docId, pageCount };
+  return { docId, pageCount, firstPage: firstPageOf(document_) };
+}
+
+/**
+ * The first page's size as a reader sees it — rotation applied — so a tool can
+ * say what paper the document is on.
+ */
+function firstPageOf(document_) {
+  const first = document_.getPage(0);
+  const { width, height } = first.getCropBox();
+  const turned = first.getRotation().angle % 180 !== 0;
+  return turned ? { width: height, height: width } : { width, height };
+}
+
+/**
+ * Puts every page of another file into an open document, before page index
+ * `at`, and makes the result the document every later operation works on — so
+ * a tool can take in more files without a trip through Gabungkan.
+ *
+ * The bytes handed back are a copy: the worker transfers them to the page, and
+ * the stored ones must stay behind.
+ */
+export async function insert({ docId, bytes, name, at }) {
+  const target = await documentOf(docId);
+  const source = await loadDocument(bytes, name);
+  const position = Math.max(0, Math.min(at ?? Infinity, target.getPageCount()));
+
+  const pages = await target.copyPages(source, source.getPageIndices());
+  pages.forEach((page, offset) => target.insertPage(position + offset, page));
+
+  const saved = await target.save();
+  documents.set(docId, saved);
+  return {
+    pageCount: target.getPageCount(),
+    firstPage: firstPageOf(target),
+    at: position,
+    inserted: pages.length,
+    bytes: saved.slice(),
+  };
 }
 
 export function close({ docId }) {
@@ -186,11 +225,6 @@ export async function arrange({ docId, order }) {
 
 /* ---------------------------------------------------------------- images */
 
-/** ISO/US page sizes in PDF points, portrait. */
-const pageSizes = {
-  a4: [595.28, 841.89],
-  letter: [612, 792],
-};
 
 /** imagesId -> the document being filled and the images embedded so far. */
 const imageJobs = new Map();
@@ -231,7 +265,7 @@ export async function imagesAdd({ imagesId, bytes, kind }) {
  * Lays the embedded images out, one per page.
  *
  * `pageSize` is either 'fit' (each page matches its image) or a key of
- * `pageSizes`. `margin` is in points and only applies to fixed page sizes.
+ * `paperSizes`. `margin` is in points and only applies to fixed page sizes.
  */
 export async function imagesBuild({
   imagesId,
@@ -254,7 +288,7 @@ export async function imagesBuild({
       continue;
     }
 
-    const [shortSide, longSide] = pageSizes[pageSize] ?? pageSizes.a4;
+    const [shortSide, longSide] = (paperSizes[pageSize] ?? paperSizes.a4).size;
     const landscape =
       orientation === 'landscape' || (orientation === 'auto' && image.width > image.height);
     const [pageWidth, pageHeight] = landscape ? [longSide, shortSide] : [shortSide, longSide];
@@ -468,6 +502,41 @@ export async function edit({ docId, items, images = [] }) {
       page.drawRectangle({ ...shape, ...fill, ...border });
     }
   }
+
+  return output.save();
+}
+
+/* ----------------------------------------------------------------- resize */
+
+/**
+ * Puts every page onto a sheet of a new size, scaled to fit inside the margin
+ * and centred (see `fitPage`). `target` is the sheet in points.
+ *
+ * Each page is embedded whole and drawn onto the new sheet, which is what lets
+ * any page — whatever its boxes, origin or rotation — be scaled the same way.
+ * The cost is the page's annotations: links and form fields are not carried
+ * over, since they live beside the page content rather than in it.
+ */
+export async function resize({ docId, target, orientation = 'auto', margin = 0 }) {
+  const source = await documentOf(docId);
+  const output = stamp(await PDFDocument.create());
+  const pages = source.getPages();
+
+  // The crop box is what a reader shows; pdf-lib would otherwise embed the
+  // media box from 0,0, which is wrong for any page whose boxes start elsewhere.
+  const boxes = pages.map((page) => {
+    const { x, y, width, height } = page.getCropBox();
+    return { left: x, bottom: y, right: x + width, top: y + height };
+  });
+  const embedded = await output.embedPages(pages, boxes);
+
+  embedded.forEach((form, index) => {
+    const rotation = pages[index].getRotation().angle;
+    const fit = fitPage({ width: form.width, height: form.height, rotation }, target, orientation, margin);
+    const page = output.addPage([fit.width, fit.height]);
+    page.setRotation(degrees(((rotation % 360) + 360) % 360));
+    page.drawPage(form, { x: fit.x, y: fit.y, xScale: fit.scale, yScale: fit.scale });
+  });
 
   return output.save();
 }

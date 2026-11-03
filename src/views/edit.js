@@ -18,6 +18,7 @@ import { baselineRatio, createEditor, lineHeight, textFonts } from '../lib/edito
 import { imageKind, reencodeAsJpeg } from '../lib/image.js';
 import { winAnsiText } from '../lib/annotate.js';
 import { createFileLoader } from '../lib/loader.js';
+import { createInsertControl } from '../lib/insert.js';
 import { subNavMarkup } from '../lib/nav.js';
 import { brandIcon } from '../lib/icons.js';
 
@@ -129,6 +130,8 @@ export function renderEdit() {
               <i data-lucide="trash-2" class="size-[18px]"></i>
             </button>
           </div>
+
+          <div data-insert></div>
 
           <div class="sticky top-[136px] z-30 space-y-3 rounded-lg border border-hairline bg-white/95 p-3 shadow-soft">
             <div role="toolbar" aria-label="Alat edit" class="flex flex-wrap items-center gap-1.5">
@@ -401,39 +404,66 @@ export function renderEdit() {
     setStatus(null, '');
   }
 
+  /** Points the view at a (new) preview: measures its pages and mounts a fresh editor. */
+  async function showDocument(preview) {
+    editor?.destroy();
+    if (state.preview && state.preview !== preview) closePreview(state.preview);
+    state.preview = preview;
+
+    // Display size of every page, its own rotation included — the space every
+    // item's geometry is measured in.
+    state.pages = [];
+    for (let number = 1; number <= preview.numPages; number++) {
+      const viewport = (await preview.getPage(number)).getViewport({ scale: 1 });
+      state.pages.push({ width: viewport.width, height: viewport.height });
+    }
+
+    metaHost.textContent = `${state.pages.length} halaman · ${formatBytes(state.file.size)}`;
+    editor = createEditor({
+      pdfDocument: preview,
+      pages: state.pages,
+      state,
+      remember,
+      onChange: sync,
+    });
+    pagesHost.replaceChildren(editor.element);
+    sync();
+  }
+
+  // Everything already drawn stays on its page: items on pages after the
+  // insertion point move down with them, in the undo history too.
+  const insertControl = createInsertControl({
+    getDocId: () => state.docId,
+    getPageCount: () => state.pages.length,
+    onInserted: async (result) => {
+      const shift = (items) =>
+        items.forEach((item) => {
+          if (item.page >= result.at) item.page += result.inserted;
+        });
+      shift(state.items);
+      past.forEach(shift);
+      state.file = new File([result.bytes], state.file.name, { type: 'application/pdf' });
+      setStatus(null, '');
+      await showDocument(await openPreview(result.bytes));
+    },
+  });
+
   const loader = createFileLoader({
     id: 'edit',
     onReset: clearDocument,
     onReady: async (file, bytes) => {
-      const { docId, pageCount } = await openDocument(bytes, file.name);
+      const { docId } = await openDocument(bytes, file.name);
       state.file = file;
       state.docId = docId;
-      state.preview = await openPreview(file);
-
-      // Display size of every page, its own rotation included — the space every
-      // item's geometry is measured in.
-      state.pages = [];
-      for (let number = 1; number <= pageCount; number++) {
-        const viewport = (await state.preview.getPage(number)).getViewport({ scale: 1 });
-        state.pages.push({ width: viewport.width, height: viewport.height });
-      }
 
       nameHost.textContent = file.name;
-      metaHost.textContent = `${pageCount} halaman · ${formatBytes(file.size)}`;
       setVisible(detailHost, true);
-
-      editor = createEditor({
-        pdfDocument: state.preview,
-        pages: state.pages,
-        state,
-        remember,
-        onChange: sync,
-      });
-      pagesHost.replaceChildren(editor.element);
-      sync();
+      await showDocument(await openPreview(file));
+      insertControl.refresh();
     },
   });
   root.querySelector('[data-loader]').replaceWith(loader.element);
+  root.querySelector('[data-insert]').replaceWith(insertControl.element);
   root.querySelector('[data-reset]').addEventListener('click', () => loader.reset());
 
   /* ------------------------------------------------------------------- save */

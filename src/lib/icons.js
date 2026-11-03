@@ -56,6 +56,14 @@ const shapes = {
     <path d="M8 11h5"/>
     <path d="m19.8 12.6 1.6 1.6-6 6-2.4.8.8-2.4Z"/>
   `,
+  /** A small sheet, and the larger sheet it grows into. */
+  resize: `
+    <rect x="2.6" y="10.4" width="8.4" height="11" rx="1.6"/>
+    <path d="M14.4 2.6h5.2a1.8 1.8 0 0 1 1.8 1.8v15.2a1.8 1.8 0 0 1-1.8 1.8h-4.4"/>
+    <path d="M5.4 7.4V4.4a1.8 1.8 0 0 1 1.8-1.8h3"/>
+    <path d="m11 13 6.2-6.2"/>
+    <path d="M13.2 6.8h4v4"/>
+  `,
   /** The house mark: a sheet beside a page turning away from it. */
   brand: `
     <rect x="3.6" y="4.6" width="7" height="14.8" rx="1.8"/>
